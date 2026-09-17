@@ -8,14 +8,25 @@ sync_dir:
 
 agent:
   notes: |
-    Project created by ws-bridge create_project. Keep bridge.yml commands runnable from the project root.
+    Dependency-free static site. Keep catalog metadata intentionally small and audio files web-sized.
+    Run validate before publishing. GitHub Pages deployment is handled by .github/workflows/pages.yml.
   tasks: []
   changelog:
-    - Initialized project scaffold.
+    - Added the initial audio-reactive listening room and GitHub Pages deployment.
 
 commands:
-  list:
-    description: List project files
-    category: custom
+  validate:
+    description: Validate catalog structure and referenced audio files
+    category: test
     cwd: .
-    run: ["find", ".", "-maxdepth", "2", "-type", "f"]
+    run: ["python", "scripts/validate.py"]
+  build:
+    description: Assemble the public GitHub Pages artifact
+    category: build
+    cwd: .
+    run: ["python", "scripts/build_site.py"]
+  serve:
+    description: Preview the static site locally on port 4173
+    category: dev
+    cwd: .
+    run: ["python", "-m", "http.server", "4173", "--bind", "127.0.0.1"]

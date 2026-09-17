@@ -7,3 +7,6 @@
 *.tmp
 .vscode/
 .idea/
+__pycache__/
+.python-version
+_site/
