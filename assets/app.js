@@ -5,6 +5,7 @@
   const catalogEl = document.querySelector("#catalog");
   const errorEl = document.querySelector("#catalog-error");
   const countEl = document.querySelector("#track-count");
+  const groupTabsEl = document.querySelector("#group-tabs");
   const player = document.querySelector("#player");
   const titleEl = document.querySelector("#player-title");
   const statusEl = document.querySelector("#player-status");
@@ -26,6 +27,7 @@
 
   let tracks = [];
   let activeIndex = -1;
+  let activeGroup = "all";
   let audioContext = null;
   let analyser = null;
   let source = null;
@@ -39,10 +41,73 @@
   };
 
   const trackMeta = (track) => [track.bpm ? `${track.bpm} bpm` : "", track.key || ""].filter(Boolean).join(" · ");
+  const trackGroup = (track) => (typeof track.group === "string" && track.group.trim() ? track.group.trim() : "Other");
+
+  function visibleTrackIndices() {
+    const indices = [];
+    tracks.forEach((track, index) => {
+      if (activeGroup === "all" || trackGroup(track) === activeGroup) indices.push(index);
+    });
+    return indices;
+  }
+
+  function setActiveGroup(group) {
+    activeGroup = group;
+    renderGroupTabs();
+    renderCatalog();
+    if (activeIndex >= 0) selectTrack(activeIndex, false);
+  }
+
+  function renderGroupTabs() {
+    const groups = [];
+    tracks.forEach((track) => {
+      const group = trackGroup(track);
+      if (!groups.includes(group)) groups.push(group);
+    });
+
+    const entries = [
+      { id: "all", label: "All", count: tracks.length },
+      ...groups.map((group) => ({ id: group, label: group, count: tracks.filter((track) => trackGroup(track) === group).length }))
+    ];
+
+    groupTabsEl.replaceChildren();
+    entries.forEach((entry, position) => {
+      const button = document.createElement("button");
+      button.className = "group-tab";
+      button.type = "button";
+      button.setAttribute("role", "tab");
+      button.setAttribute("aria-selected", String(entry.id === activeGroup));
+      button.setAttribute("aria-controls", "catalog");
+      button.tabIndex = entry.id === activeGroup ? 0 : -1;
+      button.append(document.createTextNode(entry.label));
+
+      const count = document.createElement("span");
+      count.className = "group-tab-count";
+      count.textContent = String(entry.count);
+      button.append(count);
+
+      button.addEventListener("click", () => setActiveGroup(entry.id));
+      button.addEventListener("keydown", (event) => {
+        const tabs = Array.from(groupTabsEl.querySelectorAll('[role="tab"]'));
+        let nextPosition = position;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") nextPosition = (position + 1) % tabs.length;
+        else if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextPosition = (position - 1 + tabs.length) % tabs.length;
+        else if (event.key === "Home") nextPosition = 0;
+        else if (event.key === "End") nextPosition = tabs.length - 1;
+        else return;
+        event.preventDefault();
+        setActiveGroup(entries[nextPosition].id);
+        groupTabsEl.querySelector('[role="tab"][aria-selected="true"]')?.focus();
+      });
+      groupTabsEl.append(button);
+    });
+  }
 
   function renderCatalog() {
     catalogEl.replaceChildren();
-    tracks.forEach((track, index) => {
+    const visible = visibleTrackIndices();
+    visible.forEach((index) => {
+      const track = tracks[index];
       const row = document.createElement("article");
       row.className = "track";
       row.dataset.index = String(index);
@@ -92,7 +157,10 @@
       });
       catalogEl.append(row);
     });
-    countEl.textContent = `${tracks.length} render${tracks.length === 1 ? "" : "s"}`;
+    const count = visible.length;
+    countEl.textContent = activeGroup === "all"
+      ? `${count} render${count === 1 ? "" : "s"}`
+      : `${count} of ${tracks.length} renders`;
   }
 
   async function ensureAudioGraph() {
@@ -131,7 +199,8 @@
     statusEl.textContent = track.status || "demo";
     metaEl.textContent = [track.collection, trackMeta(track)].filter(Boolean).join(" / ");
     noteEl.textContent = track.note || "No note for this render.";
-    document.querySelectorAll(".track").forEach((row, rowIndex) => {
+    document.querySelectorAll(".track").forEach((row) => {
+      const rowIndex = Number(row.dataset.index);
       row.classList.toggle("active", rowIndex === activeIndex);
       const button = row.querySelector(".track-play");
       const isActivePlaying = rowIndex === activeIndex && !audio.paused;
@@ -140,6 +209,16 @@
     });
 
     if (autoplay) playAudio();
+  }
+
+  function stepTrack(direction) {
+    const visible = visibleTrackIndices();
+    if (!visible.length) return;
+    const currentPosition = visible.indexOf(activeIndex);
+    const nextPosition = currentPosition === -1
+      ? (direction > 0 ? 0 : visible.length - 1)
+      : (currentPosition + direction + visible.length) % visible.length;
+    selectTrack(visible[nextPosition], true);
   }
 
   async function playAudio() {
@@ -159,7 +238,8 @@
     toggle.setAttribute("aria-pressed", String(playing));
     toggle.setAttribute("aria-label", playing ? "Pause" : "Play");
     toggleIcon.textContent = playing ? "Ⅱ" : "▶";
-    document.querySelectorAll(".track").forEach((row, rowIndex) => {
+    document.querySelectorAll(".track").forEach((row) => {
+      const rowIndex = Number(row.dataset.index);
       const button = row.querySelector(".track-play");
       const isActivePlaying = rowIndex === activeIndex && playing;
       button.textContent = isActivePlaying ? "Ⅱ" : "▶";
@@ -238,11 +318,11 @@
     if (audio.paused) playAudio();
     else audio.pause();
   });
-  prevButton.addEventListener("click", () => selectTrack(activeIndex <= 0 ? tracks.length - 1 : activeIndex - 1, true));
-  nextButton.addEventListener("click", () => selectTrack(activeIndex + 1, true));
+  prevButton.addEventListener("click", () => stepTrack(-1));
+  nextButton.addEventListener("click", () => stepTrack(1));
   audio.addEventListener("play", syncPlayingState);
   audio.addEventListener("pause", syncPlayingState);
-  audio.addEventListener("ended", () => selectTrack(activeIndex + 1, true));
+  audio.addEventListener("ended", () => stepTrack(1));
   audio.addEventListener("loadedmetadata", () => { durationEl.textContent = formatTime(audio.duration); });
   audio.addEventListener("timeupdate", () => {
     elapsedEl.textContent = formatTime(audio.currentTime);
@@ -268,6 +348,7 @@
     .then((catalog) => {
       if (!catalog || !Array.isArray(catalog.tracks)) throw new Error("catalog.json must contain a tracks array");
       tracks = catalog.tracks;
+      renderGroupTabs();
       renderCatalog();
       if (tracks.length) selectTrack(0, false);
       draw();

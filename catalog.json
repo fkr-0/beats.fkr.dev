@@ -7,6 +7,7 @@
       "src": "audio/frost-wire.mp3",
       "status": "demo",
       "collection": "grime revival / qa repair",
+      "group": "Grime",
       "bpm": 140,
       "key": "D minor",
       "note": "Fresh QA-repair listening render. Dark 140 BPM grime construction; still treated as a lab demo rather than a release master."
@@ -17,6 +18,7 @@
       "src": "audio/estate-voltage.mp3",
       "status": "demo",
       "collection": "grime revival / qa repair",
+      "group": "Grime",
       "bpm": 142,
       "key": "E minor",
       "note": "Fresh QA-repair listening render from the grime revival batch. Kept here as an evolving demo."
@@ -27,6 +29,7 @@
       "src": "audio/night-bus-bleep.mp3",
       "status": "demo",
       "collection": "grime revival / qa repair",
+      "group": "Grime",
       "bpm": 138,
       "key": "G minor",
       "note": "Fresh QA-repair listening render. The note field is intentionally freeform so production context can travel with a track without inventing a large schema."
@@ -37,6 +40,7 @@
       "src": "audio/stoop-echo-87.mp3",
       "status": "demo",
       "collection": "low bounce revival",
+      "group": "Low bounce",
       "bpm": 87,
       "note": "320 kbps Sample Lab listening copy from the 84–87 BPM sample-rap revival run."
     },
@@ -46,6 +50,7 @@
       "src": "audio/curb-bounce-86.mp3",
       "status": "demo",
       "collection": "low bounce revival",
+      "group": "Low bounce",
       "bpm": 86,
       "note": "320 kbps listening render; dusty, compact, rapper-friendly pocket."
     },
@@ -55,6 +60,7 @@
       "src": "audio/brownstone-swing-85.mp3",
       "status": "demo",
       "collection": "low bounce revival",
+      "group": "Low bounce",
       "bpm": 85,
       "key": "D minor",
       "note": "320 kbps listening render from the low-bounce Sample Lab batch."
@@ -65,6 +71,7 @@
       "src": "audio/block-party-84.mp3",
       "status": "demo",
       "collection": "low bounce revival",
+      "group": "Low bounce",
       "bpm": 84,
       "key": "D minor",
       "note": "320 kbps listening render built around a loose sample-based head-nod pocket."

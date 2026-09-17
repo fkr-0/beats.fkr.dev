@@ -139,6 +139,46 @@ h1 {
 .section-head h2 { margin: 0; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: clamp(1.6rem, 3vw, 2.6rem); font-weight: 520; letter-spacing: -0.04em; }
 .track-count { margin: 0; color: var(--dim); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; }
 
+.group-tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0 0 1rem;
+  padding: 0.2rem 0 0.45rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.group-tab {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.45rem;
+  padding: 0.55rem 0.82rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.018);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.group-tab:hover { border-color: var(--line-hot); color: var(--ink); }
+.group-tab:focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; }
+.group-tab[aria-selected="true"] {
+  border-color: var(--line-hot);
+  background: rgba(184, 154, 231, 0.11);
+  color: var(--ink);
+}
+.group-tab-count {
+  color: var(--dim);
+  font-size: 0.58rem;
+  font-variant-numeric: tabular-nums;
+}
+.group-tab[aria-selected="true"] .group-tab-count { color: var(--acid); }
+
 .catalog { border-top: 1px solid var(--line); }
 .track {
   position: relative;
