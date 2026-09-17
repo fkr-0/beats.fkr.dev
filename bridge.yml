@@ -1,0 +1,21 @@
+version: 1
+name: beats.fkr.dev
+description: Static audio showcase for Sample Lab beats and music experiments.
+default_track: local
+shell: true
+sync_dir:
+  - .
+
+agent:
+  notes: |
+    Project created by ws-bridge create_project. Keep bridge.yml commands runnable from the project root.
+  tasks: []
+  changelog:
+    - Initialized project scaffold.
+
+commands:
+  list:
+    description: List project files
+    category: custom
+    cwd: .
+    run: ["find", ".", "-maxdepth", "2", "-type", "f"]
